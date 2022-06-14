@@ -78,10 +78,8 @@ public class PostServiceImpl implements PostService {
         headers.setContentType(MediaType.APPLICATION_JSON);
 
         // HttpEntity<CommentDTO[]> httpEntity =new HttpEntity<>(headers);
-        CommentDTO[] comments =  restTemplate.getForObject(this.postBaseUrl+"/posts/{postId}/comments",
-                CommentDTO[].class, postId);
+        CommentDTO[] comments =  restTemplate.getForObject(this.postBaseUrl+"/posts/{postId}/comments", CommentDTO[].class, postId);
         System.out.println(comments.length);
-
         return comments;
     }
 }
