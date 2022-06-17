@@ -7,6 +7,7 @@ import com.myfb.postservice.repository.PostRepository;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
@@ -19,14 +20,17 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
-public class PostServiceImpl implements PostService {
+public class PostServiceImpl implements PostService{
+
     @Autowired
     private PostRepository postRepository;
+
     @Autowired
     private RestTemplate restTemplate;
 
     @Value("${postapi.base.url:}")
     private String postBaseUrl;
+
     @Override
     public PostDTO createPost(PostDTO postDTO) {
 
@@ -38,48 +42,44 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
-    public PostDTO getPostDetail(Long postId) {
-
-        Optional<PostEntity> optEntity= postRepository.findById(postId);
+    public PostDTO getPostDetails(Long postId) {
+        Optional<PostEntity> optEntity =  postRepository.findById(postId);
         PostDTO postDTO = null;
         if(optEntity.isPresent()){
-            postDTO =new PostDTO();
-            BeanUtils.copyProperties(optEntity.get(), postDTO);
+            postDTO = new PostDTO();
+            BeanUtils.copyProperties(optEntity.get(),postDTO);
         }
         optEntity.orElseThrow(()->new RuntimeException("No post found with Id"+postId));
-
-
         return postDTO;
     }
 
     @Override
     public List<PostDTO> getAllPostByUser(Long userId) {
-
         List<PostEntity> posts = postRepository.findAllByUserId(userId);
-        List<PostDTO> postDTOS = null;
+        List<PostDTO> postDtos = null;
         PostDTO postDTO = null;
 
         if(posts != null && !posts.isEmpty()){
-            postDTOS = new ArrayList<>();
-            for(PostEntity pe :posts ){
+            postDtos = new ArrayList<>();
+            for(PostEntity pe : posts){
                 postDTO = new PostDTO();
                 BeanUtils.copyProperties(pe, postDTO);
-                postDTOS.add(postDTO);
+                postDtos.add(postDTO);
             }
         }
-
-        return postDTOS;
+        return postDtos;
     }
 
     @Override
-    public CommentDTO[] getAllCommentsForPostId(Long postId){
+    public CommentDTO[] getAllCommentsForPostId( Long postId){
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
 
-        // HttpEntity<CommentDTO[]> httpEntity =new HttpEntity<>(headers);
-        CommentDTO[] comments =  restTemplate.getForObject(this.postBaseUrl+"/posts/{postId}/comments", CommentDTO[].class, postId);
+        //HttpEntity<CommentDTO[]> httpEntity = new HttpEntity<>(headers);
+        CommentDTO[] comments = restTemplate.getForObject(this.postBaseUrl+"/posts/{postId}/comments", CommentDTO[].class, postId);
         System.out.println(comments.length);
+
         return comments;
     }
 }

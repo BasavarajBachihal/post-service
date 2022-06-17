@@ -8,7 +8,7 @@ import java.util.List;
 public interface PostService {
 
     PostDTO createPost(PostDTO postDTO);
-    PostDTO getPostDetail(Long PostId);
-    List<PostDTO> getAllPostByUser(Long UserId);
+    PostDTO getPostDetails(Long postId);
+    List<PostDTO> getAllPostByUser(Long userId);
     CommentDTO[] getAllCommentsForPostId(Long postId);
 }
